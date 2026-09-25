@@ -61,6 +61,7 @@ before adding/updating sources if it prevents downloads.
 
 Back up `/etc/config/v2raya` and `/etc/v2raya/` before migration. The branded
 packages declare replacement of `v2raya`, `v2raya-core` and `luci-app-v2raya`.
+The previous personal package names are also replaced automatically.
 Modified UCI configuration is retained. opkg may report that the new template
 was saved as `/etc/config/v2raya-opkg`; this message is expected and does not mean
 the preserved configuration was overwritten.
