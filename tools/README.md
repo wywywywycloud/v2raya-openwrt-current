@@ -4,6 +4,13 @@ The legacy SDK recipe at `v2raya/Makefile` targets v2.2.7.4. Current
 v2rayA has a separate `core/` Go module and requires its matching
 `v2raya_core`, not an independently installed `xray-core` binary.
 
+The legacy recipe's `core/iptables.TproxyNotSkipBr=true` linker flag still
+controls LAN bridge interception in its pinned v2.2.7.4 sources. Keep it in
+that recipe. The current-source pipeline does not pass that flag: use a
+checkout containing [v2rayA #2057](https://github.com/v2rayA/v2rayA/pull/2057),
+which includes OpenWrt LAN bridges through runtime defaults and migrates the
+exact historical exclusion list. Custom interface exclusions remain intact.
+
 This alternative source-build pipeline packages both binaries and the LuCI
 sources from this checkout for `aarch64_cortex-a53`. It does not require
 replacing the Go compiler inside the OpenWrt 24.10 SDK.
