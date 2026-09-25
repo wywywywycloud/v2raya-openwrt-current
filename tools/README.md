@@ -12,7 +12,7 @@ Requirements: Go 1.26 (or automatic Go toolchain selection), Node.js 24,
 Yarn Classic, Python 3, Git and `shasum`.
 
 ```sh
-./tools/build-current.sh /path/to/v2rayA 2.5.7-recovery.1 r1 ./packages
+./tools/build-current.sh /path/to/v2rayA 2.5.7-custom.1 r1 ./packages
 ```
 
 The input checkout must include the desired changes. Both binaries receive
@@ -44,3 +44,18 @@ These packages contain static userspace ARM64 programs, not kernel modules.
 Kernel dependencies must come from the exact installed OpenWrt release's
 feeds. VM validation on generic ARM64 does not validate a physical router's
 wireless drivers, hardware offload or flash upgrade process.
+
+## Application integration checks
+
+For the automatic-group and subscription-timer changes in
+[v2rayA #2055](https://github.com/v2rayA/v2rayA/pull/2055), run the application's
+`tests/openwrt/automation.py` against a disposable OpenWrt 24.10.4 VM. It uses
+synthetic VLESS subscriptions and an independent direct-traffic trap. Check
+the entire catalog, all-dead blocking, recovery and actual minute retries;
+one working first node is not a sufficient installation test.
+
+After the VM suite passes, publish a signed index and test installation or
+upgrade through LuCI Software with signature verification enabled and without
+force-overwrite. Confirm the exact service/core pair, preserved accounts and
+UCI settings, and the application UI. The application owns group membership
+and subscription timers; this LuCI package configures the OpenWrt service.
