@@ -44,3 +44,16 @@ These packages contain static userspace ARM64 programs, not kernel modules.
 Kernel dependencies must come from the exact installed OpenWrt release's
 feeds. VM validation on generic ARM64 does not validate a physical router's
 wireless drivers, hardware offload or flash upgrade process.
+
+## Levin distribution branch
+
+This branch packages the same tested application as `v2raya-levin`,
+`v2raya-levin-core` and `luci-app-v2raya-levin`. Install the LuCI package to
+resolve the exact matching service/core pair. The packages replace the original
+names while retaining their service and configuration paths.
+
+The index ends every package paragraph, including the final one, with a blank
+line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
+
+Use release `r7.levin1` with application version `2.5.7-recovery.2`.
+See [installation instructions](../LEVIN-INSTALL.md).
