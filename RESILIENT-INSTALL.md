@@ -10,6 +10,8 @@ The signed opkg distribution is validated on every final OpenWrt 24.10 release
 from **24.10.0 through 24.10.8**, including **24.10.5**. All nine official
 `armsr/armv8` images completed a clean signed-feed install using their own
 kernel modules, then started the matching service/core, embedded GUI and LuCI.
+This is a compatibility matrix, not a recommendation to remain on an older
+patch release; use the newest 24.10 security update available for the router.
 
 OpenWrt 25.12 is outside this distribution: that series replaced opkg/IPK with
 apk/APK and requires separate native packages and a signed APK repository. No
