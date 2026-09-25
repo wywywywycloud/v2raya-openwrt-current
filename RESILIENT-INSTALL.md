@@ -93,7 +93,7 @@ For an existing Resilient installation, update package lists and upgrade
 
 ## Sources and validation
 
-- Application/core: [Resilient source branch](https://github.com/wywywywycloud/v2rayA-current/tree/release/resilient-openwrt-24.10), application commit `0aafe7fc`.
+- Application/core: [Resilient source branch](https://github.com/wywywywycloud/v2rayA-current/tree/release/resilient-openwrt-24.10), application commit `4e8fc7d4`.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
