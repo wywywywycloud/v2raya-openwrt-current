@@ -1,8 +1,19 @@
-# v2rayA Resilient for OpenWrt 24.10.4
+# v2rayA Resilient for OpenWrt 24.10
 
 This is the personal fork distribution, separate from the upstream pull requests.
 Supported package architecture: **aarch64_cortex-a53**. Do not add a different
 architecture to a physical router to bypass opkg checks.
+
+## Supported OpenWrt releases
+
+The signed opkg distribution is validated on every final OpenWrt 24.10 release
+from **24.10.0 through 24.10.8**, including **24.10.5**. All nine official
+`armsr/armv8` images completed a clean signed-feed install using their own
+kernel modules, then started the matching service/core, embedded GUI and LuCI.
+
+OpenWrt 25.12 is outside this distribution: that series replaced opkg/IPK with
+apk/APK and requires separate native packages and a signed APK repository. No
+end-of-life OpenWrt series is listed as supported.
 
 ## Names
 
@@ -107,6 +118,10 @@ The service embeds its GUI and uses its matching v2raya_core. Packages are
 assembled by `tools/build-current.sh` / `tools/package-current.py` using static
 Linux ARM64 binaries. This is not a claim of a full OpenWrt SDK build.
 
-The disposable VM uses official OpenWrt 24.10.4 armsr/armv8 with 256 MiB RAM.
-Its generic ARM64 CPU accepts the Cortex-A53 package via a **test-only** opkg
-architecture alias. Physical hardware and other architectures are not covered.
+The release matrix uses all nine official OpenWrt 24.10.0-24.10.8 armsr/armv8
+images with 256 MiB RAM. Full functional, migration, failure and reboot tests
+run on 24.10.4 and 24.10.5; the other releases repeat the clean signed-feed,
+release-native kernel-module, service/core, embedded-GUI and LuCI checks. The
+VM's generic ARM64 CPU accepts the Cortex-A53 package through a **test-only**
+opkg architecture alias. Physical hardware and other architectures are not
+covered.
