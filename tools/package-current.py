@@ -107,6 +107,8 @@ def main():
         args.output, "luci-app-v2raya", args.luci_version,
         f"luci-light, v2raya (= {args.version})", luci,
     )
+    # LuCI commits an index entry at the blank paragraph separator.
+    index += "\n"
     (args.output / "Packages").write_text(index)
     (args.output / "Packages.gz").write_bytes(gzip.compress(index.encode(), mtime=0))
 
