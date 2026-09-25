@@ -8,9 +8,9 @@ architecture to a physical router to bypass opkg checks.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-levin** | Install this one in LuCI; pulls the complete fork | 26.268.0-r7.levin1 |
-| v2raya-levin | Service and embedded v2rayA web interface | 2.5.7-recovery.2-r7.levin1 |
-| v2raya-levin-core | Exact matching proxy core | 2.5.7-recovery.2-r7.levin1 |
+| **luci-app-v2raya-levin** | Install this one in LuCI; pulls the complete fork | 26.268.0-r7.levin2 |
+| v2raya-levin | Service and embedded v2rayA web interface | 2.5.7-recovery.2-r7.levin2 |
+| v2raya-levin-core | Exact matching proxy core | 2.5.7-recovery.2-r7.levin2 |
 
 The menu is **Services > v2rayA Levin**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a

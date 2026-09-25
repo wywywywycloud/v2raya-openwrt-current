@@ -50,9 +50,10 @@ def package(out, name, version, depends, files, conffiles=""):
     )
     controls = {"control": (control.encode(), 0o644)}
     if original in ("v2raya", "v2raya-core"):
-        controls["preinst"] = (b'#!/bin/sh\n[ -n "$IPKG_INSTROOT" ] && exit 0\n[ ! -x /etc/init.d/v2raya ] || /etc/init.d/v2raya stop\nexit 0\n', 0o755)
+        controls["preinst"] = (b'#!/bin/sh\n[ -n "$IPKG_INSTROOT" ] && exit 0\nif [ -x /etc/init.d/v2raya ] && /etc/init.d/v2raya running; then\n    /etc/init.d/v2raya stop\nfi\nexit 0\n', 0o755)
     if original == "v2raya":
-        controls["postinst"] = (b'#!/bin/sh\n[ -n "$IPKG_INSTROOT" ] && exit 0\n/etc/init.d/v2raya enable\n/etc/init.d/v2raya start || true\nexit 0\n', 0o755)
+        controls["prerm"] = controls["preinst"]
+        controls["postinst"] = (b'#!/bin/sh\n[ -n "$IPKG_INSTROOT" ] && exit 0\n/etc/init.d/v2raya enable\ncase "$(uci -q get v2raya.config.enabled)" in\n    1|on|true|yes|enabled) /etc/init.d/v2raya start ;;\nesac\nexit 0\n', 0o755)
     if original == "luci-app-v2raya":
         controls["postinst"] = (b'#!/bin/sh\n[ -n "$IPKG_INSTROOT" ] && exit 0\nrm -f /tmp/luci-indexcache\nexit 0\n', 0o755)
     if conffiles:

@@ -55,5 +55,5 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r7.levin1` with application version `2.5.7-recovery.2`.
+Use release `r7.levin2` with application version `2.5.7-recovery.2`.
 See [installation instructions](../LEVIN-INSTALL.md).
