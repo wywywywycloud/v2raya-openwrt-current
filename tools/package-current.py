@@ -28,11 +28,11 @@ def archive(files):
 
 def package(out, name, version, depends, files, conffiles=""):
     original = name
-    name = {"v2raya": "v2raya-levin", "v2raya-core": "v2raya-levin-core", "luci-app-v2raya": "luci-app-v2raya-levin"}[original]
+    name = {"v2raya": "v2raya-resilient", "v2raya-core": "v2raya-resilient-core", "luci-app-v2raya": "luci-app-v2raya-resilient"}[original]
     description = {
-        "v2raya": "Levin fork of v2rayA: subscription recovery and first-server policy",
-        "v2raya-core": "Matching proxy core for v2rayA Levin",
-        "luci-app-v2raya": "v2rayA Levin - install this package for the complete fork with LuCI",
+        "v2raya": "Resilient fork of v2rayA: subscription recovery and first-server policy",
+        "v2raya-core": "Matching proxy core for v2rayA Resilient",
+        "luci-app-v2raya": "v2rayA Resilient - install this package for the complete fork with LuCI",
     }[original]
     license_name = {
         "v2raya": "AGPL-3.0-only",
@@ -40,11 +40,12 @@ def package(out, name, version, depends, files, conffiles=""):
         "luci-app-v2raya": "Apache-2.0",
     }[original]
     source = "v2raya-openwrt" if original == "luci-app-v2raya" else "v2rayA"
+    previous = {"v2raya": "v2raya-levin", "v2raya-core": "v2raya-levin-core", "luci-app-v2raya": "luci-app-v2raya-levin"}[original]
     control = (
         f"Package: {name}\nVersion: {version}\nArchitecture: aarch64_cortex-a53\n"
-        f"Provides: {original}\nConflicts: {original}\nReplaces: {original}\n"
-        f"License: {license_name}\nSource: https://github.com/wywywywycloud/{source}-current/tree/release/levin-openwrt-24.10\n"
-        "Maintainer: Mikhail Levin\nSection: net\nPriority: optional\n"
+        f"Provides: {original}, {previous}\nConflicts: {original}, {previous}\nReplaces: {original}, {previous}\n"
+        f"License: {license_name}\nSource: https://github.com/wywywywycloud/{source}-current/tree/release/resilient-openwrt-24.10\n"
+        "Maintainer: wywywywycloud\nSection: net\nPriority: optional\n"
         f"Depends: {depends}\nInstalled-Size: {sum(len(v[0]) for v in files.values())}\n"
         f"Description: {description}\n"
     )
@@ -113,20 +114,20 @@ def main():
         raise ValueError("LuCI source files are missing")
     menu = "usr/share/luci/menu.d/luci-app-v2raya.json"
     data, mode = luci[menu]
-    luci[menu] = (data.replace(b'"title": "v2rayA"', b'"title": "v2rayA Levin"'), mode)
+    luci[menu] = (data.replace(b'"title": "v2rayA"', b'"title": "v2rayA Resilient"'), mode)
     config_page = "www/luci-static/resources/view/v2raya/config.js"
     data, mode = luci[config_page]
-    luci[config_page] = (data.replace(b"_('v2rayA')", b"_('v2rayA Levin')"), mode)
+    luci[config_page] = (data.replace(b"_('v2rayA')", b"_('v2rayA Resilient')"), mode)
     args.output.mkdir(parents=True, exist_ok=False)
     index = package(args.output, "v2raya-core", args.version, "libc", core)
     index += "\n" + package(
         args.output, "v2raya", args.version,
-        f"libc, ca-bundle, kmod-nft-tproxy, v2raya-levin-core (= {args.version}), v2ray-geoip, v2ray-geosite",
+        f"libc, ca-bundle, kmod-nft-tproxy, v2raya-resilient-core (= {args.version}), v2ray-geoip, v2ray-geosite",
         app, "/etc/config/v2raya\n",
     )
     index += "\n" + package(
         args.output, "luci-app-v2raya", args.luci_version,
-        f"luci-light, v2raya-levin (= {args.version})", luci,
+        f"luci-light, v2raya-resilient (= {args.version})", luci,
     )
     # LuCI commits an index entry at the blank paragraph separator.
     index += "\n"
