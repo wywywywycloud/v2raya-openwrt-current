@@ -8,9 +8,9 @@ architecture to a physical router to bypass opkg checks.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r9.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.3-r9.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.3-r9.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r10.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.4-r10.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.4-r10.resilient1 |
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -51,7 +51,7 @@ Keep signature verification enabled.
    dialog. Leave **Allow overwriting conflicting package files** unchecked.
 3. Refresh LuCI. Open **Services > v2rayA Resilient**. On a clean installation,
    enable the service and click **Save & Apply**, then open its web interface.
-4. Confirm the application and core both report `2.5.7-resilient.3`.
+4. Confirm the application and core both report `2.5.7-resilient.4`.
 
 If Software is absent, install the official `luci-app-package-manager` first.
 The setup needs normal working Internet access. Stop a broken transparent proxy
@@ -79,21 +79,27 @@ probe URL; new groups default to **300s**. Keep group selection on **Auto** for
 least-latency selection. An empty automatic group blocks traffic assigned to it.
 This is not a system-wide kill switch for service crashes or manual shutdown.
 
-For each subscription, enable **Automatically update subscription** and enter
-both intervals in minutes. **Regular interval = 0** disables unconditional
-updates. **Failure retry** must be at least 1 minute and applies while all
-servers in that subscription are unavailable. Failed downloads keep saved nodes.
+For each subscription, choose one **Automatic subscription update** mode:
 
-Earlier first-server, auto-connect and recovery switches are retired. Existing
-accounts, subscriptions and group members are preserved; the new switches
-default off. Enable them explicitly after upgrading.
+- **Disabled** updates only when requested manually.
+- **On service start** refreshes once whenever v2rayA starts.
+- **At an interval** refreshes on startup and at the required interval in minutes.
+- **At an interval with fail-safe recovery** also tests the saved servers at the
+  required failure interval and refreshes until at least one server works.
+
+Both interval fields accept whole minutes from 1 to 525600 when their mode uses
+them. Failed or empty downloads retain the saved nodes. Upgrades preserve the
+old global startup/interval behavior without enabling fail-safe recovery.
+The retired per-subscription auto-select option enables automatic membership for
+the `PROXY` group once when at least one old subscription used it. Otherwise,
+automatic group membership remains disabled until enabled explicitly.
 
 For an existing Resilient installation, update package lists and upgrade
-**luci-app-v2raya-resilient** in Software; it requires the matching r9 service/core.
+**luci-app-v2raya-resilient** in Software; it requires the matching r10 service/core.
 
 ## Sources and validation
 
-- Application/core: [Resilient source branch](https://github.com/wywywywycloud/v2rayA-current/tree/release/resilient-openwrt-24.10), application commit `4e8fc7d4`.
+- Application/core: [Resilient source branch](https://github.com/wywywywycloud/v2rayA-current/tree/release/resilient-openwrt-24.10), application commit `a0bad190`.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
