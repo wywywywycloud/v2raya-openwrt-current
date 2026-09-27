@@ -66,13 +66,14 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r14.resilient1` with application version `2.5.7-resilient.8`.
+Use release `r15.resilient1` with application version `2.5.7-resilient.9`.
 `test-openwrt-24.10.4-arm64.ps1` accepts `-AppVersion` and `-PackageRelease`
 so each package set is checked against its own stamped binaries. For a live
 traffic run, start `local-socks-fixture.py` on the host, pass `-LiveTestSignal`
 to keep the VM running after package checks, install the official `curl`
 package in the VM and run `test-proxy-modes-openwrt.sh` there. That script
 checks all six group strategies, repeated HTTP proxy requests, failover,
-manual membership refresh and subscription reordering. Create the signal file
+manual membership refresh, subscription reordering and manual start with a
+cached automatic group. Create the signal file
 to let the VM script shut down and save its serial log.
 See [installation instructions](../RESILIENT-INSTALL.md).

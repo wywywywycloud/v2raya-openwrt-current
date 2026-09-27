@@ -179,3 +179,10 @@ after=$(main_core_pid)
 [ "$before" = "$after" ] || { echo "subscription reorder restarted the main core" >&2; exit 1; }
 expect_route A
 echo '__RESILIENT_SUBSCRIPTION_REORDER_NO_DROP_OK__'
+
+# A manual start with cached automatic members must restore traffic without
+# waiting for the next full membership probe.
+request DELETE v2ray '{}' >/dev/null
+request POST v2ray '{}' >/dev/null
+expect_route A
+echo '__RESILIENT_MANUAL_START_WITH_CACHED_GROUP_OK__'

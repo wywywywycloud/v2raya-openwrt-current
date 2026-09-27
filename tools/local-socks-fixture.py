@@ -68,7 +68,7 @@ class SocksHandler(socketserver.BaseRequestHandler):
             path = request.split(b" ", 2)[1] if b" " in request else b""
             if path == b"/health":
                 if self.server.node == "B":
-                    time.sleep(0.08)
+                    time.sleep(0.5)
                 conn.sendall(b"HTTP/1.1 204 No Content\r\nConnection: close\r\n\r\n")
             elif path == b"/trace":
                 body = self.server.node.encode()
