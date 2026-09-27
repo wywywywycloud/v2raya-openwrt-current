@@ -94,7 +94,7 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r18.resilient1` with application version `2.5.7-resilient.11`.
+Use release `r19.resilient1` with application version `2.5.7-resilient.12`.
 `test-openwrt-24.10.4-arm64.ps1` accepts `-AppVersion` and `-PackageRelease`
 so each package set is checked against its own stamped binaries. For a live
 traffic run, start `local-socks-fixture.py` on the host, pass `-LiveTestSignal`
@@ -137,3 +137,17 @@ version `2.5.7-resilient.11-r18.resilient1` and LuCI version
 `26.268.0-r18.resilient1`. `test-openwrt-24.10.4-arm64.ps1
 -CheckResilientDefaults` verifies the first-install settings and a new
 subscription through the live API on a clean OpenWrt VM.
+
+
+## Manual subscription bypass confirmation (r19)
+
+Build application commit `b3c8a0a490bd03a4b2107a3e5802028259d4b7af` with
+`apply-resilient-defaults.py` applied only to the disposable source copy. Stamp
+both binaries as `2.5.7-resilient.12`; package service/core as
+`2.5.7-resilient.12-r19.resilient1` and LuCI as `26.268.0-r19.resilient1`.
+
+Run the ARM64 VM pipeline with `-CheckResilientDefaults
+-CheckManualSubscriptionBypass`. The second check uses the disposable account
+from the defaults test, verifies import and update in stopped-core proxy/PAC
+modes, and checks that confirmation does not persist or start the core. Repeat
+with `-InstallFromPublishedFeed` after publishing the signed index.

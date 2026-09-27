@@ -6,12 +6,12 @@ architecture to a physical router to bypass opkg checks.
 
 ## Supported OpenWrt releases
 
-The current r18 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
+The current r19 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
 inclusive, on **aarch64_cortex-a53** routers. The feed setup script accepts all
 nine releases. r13 was installed across that entire version range; r17 was
 installed from the published signed feed on the official `armsr/armv8`
 VM images for **all nine releases**. The package, service, embedded GUI and LuCI
-checks passed on each version. Physical routers remain to be tested for r18.
+checks passed on each version. Physical routers remain to be tested for r19.
 Each VM also passed four proxied HTTP requests against a controlled local
 SOCKS5 test node.
 Use the newest 24.10 security update available for the router.
@@ -24,12 +24,14 @@ end-of-life OpenWrt series is listed as supported.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r18.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.11-r18.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.11-r18.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r19.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.12-r19.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.12-r19.resilient1 |
 
-r18 adds credential-free settings from the reference router as first-install
-defaults. The service and core carry matching version stamps.
+r19 adds an explicit Yes/No confirmation before a manual subscription import or
+update bypasses proxy/PAC while the core is stopped. The choice applies only to
+that request; scheduled updates and saved routing settings are unchanged. It
+retains the credential-free first-install defaults introduced in r18.
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -74,7 +76,7 @@ Keep signature verification enabled.
    dialog. Leave **Allow overwriting conflicting package files** unchecked.
 3. Refresh LuCI. Open **Services > v2rayA Resilient**. On a clean installation,
    enable the service and click **Save & Apply**, then open its web interface.
-4. Confirm the application and core both report `2.5.7-resilient.11`.
+4. Confirm the application and core both report `2.5.7-resilient.12`.
 
 If Software is absent, install the official `luci-app-package-manager` first.
 The setup needs normal working Internet access. Stop a broken transparent proxy
@@ -98,7 +100,7 @@ always retain an off-router backup.
 
 In the application, open the proxy group settings and enable **Automatically
 add available servers**. The group checks the entire Proxies catalog using its
-probe URL; new groups default to **300s**. The selection list offers latency,
+probe URL; the initial PROXY group defaults to **3000s**. The selection list offers latency,
 random-within-a-bounded-latency-window and first-available strategies. Use the
 `?` help beside the selector for the exact behavior. An empty automatic group
 blocks traffic assigned to it. On a manual start, cached group members let the
@@ -145,11 +147,11 @@ and LuCI package together. If there is too little free flash, it stops before
 upgrading any of them. The three package versions are checked afterward. opkg
 does not provide an atomic transaction, so retain a configuration backup and
 inspect the package status if an installation fails for another reason.
-An already installed r18 service/core pair does not need another upgrade.
+An already installed r19 service/core pair does not need another upgrade.
 
 ## Sources and validation
 
-- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `7d9fcfca`, with a packaging-only defaults patch.
+- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `b3c8a0a4`, with a packaging-only defaults patch.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
@@ -174,3 +176,9 @@ imported test subscription's 60-minute/one-minute failover schedule. The
 published signed feed was then installed on a second clean 24.10.4 VM with
 `opkg install luci-app-v2raya-resilient`; the same checks passed. See
 [the r18 validation report](https://github.com/wywywywycloud/v2rayA-current/blob/openwrt-feed/openwrt-24.10/resilient/VALIDATION-r18.md).
+
+
+r19 passed the clean OpenWrt 24.10.4 ARM64 package and first-install defaults
+checks. Live API tests exercised stopped-core manual import and update in both
+proxy and PAC modes, with and without the one-request bypass flag. Both routes
+remained saved, and the core stayed stopped. See [r19 validation](VALIDATION-r19.md).

@@ -11,6 +11,7 @@ param(
     [switch] $InstallFromPublishedFeed,
     [switch] $TrafficSmoke,
     [switch] $CheckResilientDefaults,
+    [switch] $CheckManualSubscriptionBypass,
     [string] $LiveTestSignal,
     [string] $WorkDir = (Join-Path ([IO.Path]::GetTempPath()) "v2raya-resilient-openwrt-arm64"),
     [int] $SshPort = 27922,
@@ -19,6 +20,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if ($CheckManualSubscriptionBypass -and -not $CheckResilientDefaults) {
+    throw 'CheckManualSubscriptionBypass requires CheckResilientDefaults'
+}
 $nullDevice = if ($IsWindows) { "NUL" } else { "/dev/null" }
 $Qemu = (Resolve-Path -LiteralPath $Qemu).Path
 $Firmware = (Resolve-Path -LiteralPath $Firmware).Path
@@ -236,6 +240,9 @@ try {
     if ($CheckResilientDefaults) {
         if (-not $TrafficSmoke) { Invoke-Serial 'opkg install curl' "__RESILIENT_CURL_READY__" 15 }
         Invoke-Serial "wget -qO /tmp/test-resilient-defaults-openwrt.sh http://10.0.2.2:$($PackagePort + 1)/test-resilient-defaults-openwrt.sh && sh /tmp/test-resilient-defaults-openwrt.sh $($PackagePort + 1)" "__RESILIENT_DEFAULTS_OK__" 10
+    }
+    if ($CheckManualSubscriptionBypass) {
+        Invoke-Serial "wget -qO /tmp/test-manual-subscription-bypass-openwrt.sh http://10.0.2.2:$($PackagePort + 1)/test-manual-subscription-bypass-openwrt.sh && sh /tmp/test-manual-subscription-bypass-openwrt.sh $($PackagePort + 1)" "__RESILIENT_MANUAL_BYPASS_OK__" 10
     }
     if ($LiveTestSignal) {
         Write-Host "OpenWrt VM ready for live tests on SSH port $SshPort; waiting for $LiveTestSignal"
