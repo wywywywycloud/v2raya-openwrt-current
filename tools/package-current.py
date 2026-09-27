@@ -30,7 +30,7 @@ def package(out, name, version, depends, files, conffiles=""):
     original = name
     name = {"v2raya": "v2raya-resilient", "v2raya-core": "v2raya-resilient-core", "luci-app-v2raya": "luci-app-v2raya-resilient"}[original]
     description = {
-        "v2raya": "Resilient fork of v2rayA: URL and throughput-aware proxy groups, five selection strategies and four update modes",
+        "v2raya": "Resilient fork of v2rayA: URL and throughput-aware proxy groups, explicit pinning and four update modes",
         "v2raya-core": "Matching proxy core for v2rayA Resilient",
         "luci-app-v2raya": "v2rayA Resilient - install this package for the complete fork with LuCI",
     }[original]

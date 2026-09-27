@@ -60,5 +60,5 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r12.resilient1` with application version `2.5.7-resilient.6`.
+Use release `r13.resilient1` with application version `2.5.7-resilient.7`.
 See [installation instructions](../RESILIENT-INSTALL.md).
