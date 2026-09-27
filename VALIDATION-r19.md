@@ -36,3 +36,10 @@ Before publication:
 The VM uses a test-only Cortex-A53 opkg architecture alias and extra `/usr`
 disk. This is not a physical-router test. This release's new VM checks cover
 24.10.4; the preceding r17 release covered all nine 24.10.0–24.10.8 versions.
+
+Published-feed verification:
+
+- A second clean OpenWrt 24.10.4 ARM64 VM added the public signed feed,
+  downloaded and installed all three r19 packages through opkg successfully.
+- Service startup, embedded GUI, matching application/core versions, first-install
+  defaults and both proxy/PAC manual-bypass API scenarios passed again.
