@@ -6,11 +6,12 @@ architecture to a physical router to bypass opkg checks.
 
 ## Supported OpenWrt releases
 
-The r13 package family was validated on every final OpenWrt 24.10 release from
-**24.10.0 through 24.10.8**, including **24.10.5**. The current r14 package
-family was installed and exercised on the official **24.10.4** `armsr/armv8`
-image. Use the newest 24.10 security update available for the router; the r14
-live traffic test does not cover every patch release or physical router model.
+The current r14 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
+inclusive, on **aarch64_cortex-a53** routers. The feed setup script accepts all
+nine releases. r13 was installed across that entire version range; r14 has so
+far been installed and exercised on the official **24.10.4** `armsr/armv8` VM
+image. The other r14 patch releases and physical routers remain to be tested.
+Use the newest 24.10 security update available for the router.
 
 OpenWrt 25.12 is outside this distribution: that series replaced opkg/IPK with
 apk/APK and requires separate native packages and a signed APK repository. No
