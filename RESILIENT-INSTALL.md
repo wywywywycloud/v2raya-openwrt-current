@@ -6,12 +6,12 @@ architecture to a physical router to bypass opkg checks.
 
 ## Supported OpenWrt releases
 
-The current r19 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
+The current r20 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
 inclusive, on **aarch64_cortex-a53** routers. The feed setup script accepts all
 nine releases. r13 was installed across that entire version range; r17 was
 installed from the published signed feed on the official `armsr/armv8`
 VM images for **all nine releases**. The package, service, embedded GUI and LuCI
-checks passed on each version. Physical routers remain to be tested for r19.
+checks passed on each version. Physical routers remain to be tested for r20.
 Each VM also passed four proxied HTTP requests against a controlled local
 SOCKS5 test node.
 Use the newest 24.10 security update available for the router.
@@ -24,14 +24,16 @@ end-of-life OpenWrt series is listed as supported.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r19.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.12-r19.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.12-r19.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r20.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.13-r20.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.13-r20.resilient1 |
 
-r19 adds an explicit Yes/No confirmation before a manual subscription import or
-update bypasses proxy/PAC while the core is stopped. The choice applies only to
-that request; scheduled updates and saved routing settings are unchanged. It
-retains the credential-free first-install defaults introduced in r18.
+r20 separates automatic membership from health checks and limits probing to
+one temporary core beside the traffic core. Keep-current measures the current
+server's speed at each configured interval and only searches alternatives on
+failure or low speed. Least latency and random check candidates sequentially;
+First available is removed. The first-install defaults and manual subscription
+bypass confirmation from earlier releases are retained.
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -76,7 +78,7 @@ Keep signature verification enabled.
    dialog. Leave **Allow overwriting conflicting package files** unchecked.
 3. Refresh LuCI. Open **Services > v2rayA Resilient**. On a clean installation,
    enable the service and click **Save & Apply**, then open its web interface.
-4. Confirm the application and core both report `2.5.7-resilient.12`.
+4. Confirm the application and core both report `2.5.7-resilient.13`.
 
 If Software is absent, install the official `luci-app-package-manager` first.
 The setup needs normal working Internet access. Stop a broken transparent proxy
@@ -147,7 +149,7 @@ and LuCI package together. If there is too little free flash, it stops before
 upgrading any of them. The three package versions are checked afterward. opkg
 does not provide an atomic transaction, so retain a configuration backup and
 inspect the package status if an installation fails for another reason.
-An already installed r19 service/core pair does not need another upgrade.
+An already installed r20 service/core pair does not need another upgrade.
 
 ## Sources and validation
 
@@ -182,3 +184,7 @@ r19 passed the clean OpenWrt 24.10.4 ARM64 package and first-install defaults
 checks. Live API tests exercised stopped-core manual import and update in both
 proxy and PAC modes, with and without the one-request bypass flag. Both routes
 remained saved, and the core stayed stopped. See [r19 validation](VALIDATION-r19.md).
+
+
+r20 was tested on one 256 MiB OpenWrt 24.10.4 VM. Membership refresh, speed-based
+failover and the two-core process bound passed. See [r20 validation](https://github.com/wywywywycloud/v2rayA-current/blob/openwrt-feed/openwrt-24.10/resilient/VALIDATION-r20.md).

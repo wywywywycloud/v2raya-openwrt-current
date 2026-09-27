@@ -14,6 +14,7 @@ param(
     [switch] $CheckManualSubscriptionBypass,
     [string] $LiveTestSignal,
     [string] $WorkDir = (Join-Path ([IO.Path]::GetTempPath()) "v2raya-resilient-openwrt-arm64"),
+    [ValidateRange(256, 4096)] [int] $MemoryMiB = 512,
     [int] $SshPort = 27922,
     [int] $SerialPort = 27923,
     [int] $PackagePort = 27924
@@ -72,7 +73,7 @@ function Invoke-Ssh([string] $Command, [switch] $Quiet) {
 
 $qemuArguments = @(
     "-machine", "virt,accel=tcg,gic-version=3", "-cpu", "cortex-a53",
-    "-smp", "2", "-m", "512", "-bios", $Firmware,
+    "-smp", "2", "-m", "$MemoryMiB", "-bios", $Firmware,
     "-display", "none", "-no-reboot",
     "-serial", "tcp:127.0.0.1:${SerialPort},server=on,wait=off",
     "-drive", "file=$runImage,format=raw,if=none,id=disk0",

@@ -2,15 +2,16 @@
 """Two controlled SOCKS5 nodes for OpenWrt proxy-group smoke tests.
 
 The nodes answer HTTP requests for 198.51.100.123:18100 with their node letter.
-GET /health returns 204; GET /trace returns A or B. Requests for the external
-speed sample close immediately, so this fixture tests URL reachability and
-route stability while throughput selection is covered by unit tests.
+GET /health returns 204; GET /trace returns A or B. With --speed-cert and --speed-key, HTTPS speed samples use a test certificate
+trusted only by the disposable VM. /A/slow and /A/fast control throughput;
+/state reports speed-check counts. Without a certificate, speed samples fail.
 """
 
 import argparse
 import base64
 import json
 import socketserver
+import ssl
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -19,6 +20,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 TARGET = "198.51.100.123"
 TARGET_PORT = 18100
 state = {"A": True, "B": True}
+speeds = {"A": "fast", "B": "fast"}
+checks = {"A": 0, "B": 0}
 subscription_reversed = False
 lock = threading.Lock()
 
@@ -58,15 +61,28 @@ class SocksHandler(socketserver.BaseRequestHandler):
             port = int.from_bytes(receive_exact(conn, 2), "big")
             with lock:
                 available = state[self.server.node]
-            if not available or address != TARGET or port != TARGET_PORT:
+            is_speed = port == 443 and getattr(self.server, "speed_tls", None) is not None
+            if not available or (not is_speed and (address != TARGET or port != TARGET_PORT)):
                 conn.sendall(b"\x05\x05\x00\x01\x00\x00\x00\x00\x00\x00")
                 return
             conn.sendall(b"\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00")
+            if is_speed:
+                conn = self.server.speed_tls.wrap_socket(conn, server_side=True)
             request = b""
             while b"\r\n\r\n" not in request and len(request) < 8192:
                 request += conn.recv(1024)
             path = request.split(b" ", 2)[1] if b" " in request else b""
-            if path == b"/health":
+            if is_speed:
+                with lock:
+                    speed = speeds[self.server.node]
+                    checks[self.server.node] += 1
+                body = b"x" * 262144
+                conn.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: 262144\r\nConnection: close\r\n\r\n")
+                for i in range(0, len(body), 8192):
+                    if speed == "slow": time.sleep(0.125)
+                    conn.sendall(body[i:i+8192])
+                conn.close()
+            elif path == b"/health":
                 if self.server.node == "B":
                     time.sleep(0.5)
                 conn.sendall(b"HTTP/1.1 204 No Content\r\nConnection: close\r\n\r\n")
@@ -103,7 +119,7 @@ class ControlHandler(BaseHTTPRequestHandler):
             self.send_error(404)
             return
         with lock:
-            body = json.dumps(state).encode()
+            body = json.dumps({"available": state, "speeds": speeds, "checks": checks}).encode()
         self.send_response(200)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -115,6 +131,11 @@ class ControlHandler(BaseHTTPRequestHandler):
         if parts == ["subscription", "reverse"]:
             with lock:
                 subscription_reversed = not subscription_reversed
+            self.send_response(204)
+            self.end_headers()
+            return
+        if len(parts) == 2 and parts[0] in speeds and parts[1] in ("slow", "fast"):
+            with lock: speeds[parts[0]] = parts[1]
             self.send_response(204)
             self.end_headers()
             return
@@ -136,11 +157,18 @@ def main():
     parser.add_argument("--first-port", type=int, default=18101)
     parser.add_argument("--second-port", type=int, default=18102)
     parser.add_argument("--control-port", type=int, default=18103)
+    parser.add_argument("--speed-cert")
+    parser.add_argument("--speed-key")
     args = parser.parse_args()
+    tls = None
+    if args.speed_cert:
+        tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        tls.load_cert_chain(args.speed_cert, args.speed_key)
     servers = []
     for node, port in (("A", args.first_port), ("B", args.second_port)):
         server = SocksServer((args.host, port), SocksHandler)
         server.node = node
+        server.speed_tls = tls
         servers.append(server)
     servers.append(ThreadingHTTPServer((args.host, args.control_port), ControlHandler))
     for server in servers:

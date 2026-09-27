@@ -151,3 +151,32 @@ Run the ARM64 VM pipeline with `-CheckResilientDefaults
 from the defaults test, verifies import and update in stopped-core proxy/PAC
 modes, and checks that confirmation does not persist or start the core. Repeat
 with `-InstallFromPublishedFeed` after publishing the signed index.
+
+
+## Bounded probes (r20)
+
+Build application commit `0f5101f285cddaedaf7e7f041c833bedb36de0a2` with
+`apply-resilient-defaults.py` applied to the disposable source copy only. Stamp
+both binaries `2.5.7-resilient.13`, service/core packages
+`2.5.7-resilient.13-r20.resilient1` and LuCI `26.268.0-r20.resilient1`.
+
+Use the existing ARM64 harness with `-MemoryMiB 256 -LiveTestSignal <path>`.
+Keep exactly one VM running. Stage package files on its extra `/usr` disk to
+avoid using guest RAM for IPKs while measuring the application. Run large Go
+test executables separately with the service stopped.
+
+For the deterministic live checks, generate a disposable self-signed certificate
+with SAN `DNS:speed.cloudflare.com`, trust it only in the guest's CA bundle,
+and start `local-socks-fixture.py --speed-cert <cert.pem> --speed-key <key.pem>`.
+The fixture intercepts the speed URL through its local SOCKS endpoints and can
+return fast or throttled complete samples. It does not contact Cloudflare.
+Forward host port 28925 to guest 127.0.0.1:2017, then run:
+
+```text
+python tools/test-bounded-probes.py --ssh-key <vm-key> --ssh-port 28922 --api-port 28925 --output <results>
+```
+
+The script is for a disposable VM. It creates the `vm-test` fixture account,
+imports two local SOCKS nodes, changes group policies, records sampled core
+counts and exercises real proxied requests. Do not run it against a router.
+The `ssh -F NUL` default is for the Windows host used by the ARM64 harness.
