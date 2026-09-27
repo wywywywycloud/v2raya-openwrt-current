@@ -30,6 +30,12 @@ a regular file during an upgrade.
 The init script uses `/usr/share/v2ray`, where OpenWrt installs geodata,
 avoiding an unnecessary download into a second directory on first startup.
 
+For an upgrade from the signed Resilient feed, run
+`tools/upgrade-resilient.sh` on the router. It checks that the overlay has room
+for the largest expanded binary and stages all three checksum-verified IPKs in
+`/tmp` before calling opkg. This preflight prevents a low-space core failure
+from leaving a newer service paired with an older core. opkg itself is not
+transactional, so an unrelated installation error can still require repair.
 For a local installation, copy all three IPKs to the router, update its
 configured official feed indices and install the three files together.
 Check `/api/version`: `coreVersionValid` must be true. Start the service,
@@ -60,5 +66,13 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r13.resilient1` with application version `2.5.7-resilient.7`.
+Use release `r14.resilient1` with application version `2.5.7-resilient.8`.
+`test-openwrt-24.10.4-arm64.ps1` accepts `-AppVersion` and `-PackageRelease`
+so each package set is checked against its own stamped binaries. For a live
+traffic run, start `local-socks-fixture.py` on the host, pass `-LiveTestSignal`
+to keep the VM running after package checks, install the official `curl`
+package in the VM and run `test-proxy-modes-openwrt.sh` there. That script
+checks all six group strategies, repeated HTTP proxy requests, failover,
+manual membership refresh and subscription reordering. Create the signal file
+to let the VM script shut down and save its serial log.
 See [installation instructions](../RESILIENT-INSTALL.md).

@@ -21,9 +21,9 @@ end-of-life OpenWrt series is listed as supported.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r13.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.7-r13.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.7-r13.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r14.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.8-r14.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.8-r14.resilient1 |
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -68,7 +68,7 @@ Keep signature verification enabled.
    dialog. Leave **Allow overwriting conflicting package files** unchecked.
 3. Refresh LuCI. Open **Services > v2rayA Resilient**. On a clean installation,
    enable the service and click **Save & Apply**, then open its web interface.
-4. Confirm the application and core both report `2.5.7-resilient.7`.
+4. Confirm the application and core both report `2.5.7-resilient.8`.
 
 If Software is absent, install the official `luci-app-package-manager` first.
 The setup needs normal working Internet access. Stop a broken transparent proxy
@@ -96,6 +96,9 @@ probe URL; new groups default to **300s**. The selection list offers latency,
 random-within-a-bounded-latency-window and first-available strategies. Use the
 `?` help beside the selector for the exact behavior. An empty automatic group
 blocks traffic assigned to it.
+Random chooses a server at first connection or after the selected server fails;
+it does not rotate a healthy connection on each scheduled check. Keep-current
+likewise retains its working server, including through a subscription reorder.
 Choosing a concrete server in the dashboard pins it and changes the strategy to
 **Do not switch**. Choosing **Auto** returns the group to least latency. The
 dashboard distinguishes automatic selection, a fixed pin and keep-current
@@ -121,12 +124,24 @@ The retired per-subscription auto-select option enables automatic membership for
 the `PROXY` group once when at least one old subscription used it. Otherwise,
 automatic group membership remains disabled until enabled explicitly.
 
-For an existing Resilient installation, update package lists and upgrade
-**luci-app-v2raya-resilient** in Software; it requires the matching r13 service/core.
+For an existing Resilient installation, use the staged upgrade helper over SSH:
+
+```sh
+wget -O /tmp/upgrade-resilient.sh https://raw.githubusercontent.com/wywywywycloud/v2raya-openwrt-current/release/resilient-openwrt-24.10/tools/upgrade-resilient.sh
+sh /tmp/upgrade-resilient.sh
+```
+
+The helper updates the signed feed index, checks flash and temporary space,
+downloads and verifies all three IPKs, then installs the matching core, service
+and LuCI package together. If there is too little free flash, it stops before
+upgrading any of them. The three package versions are checked afterward. opkg
+does not provide an atomic transaction, so retain a configuration backup and
+inspect the package status if an installation fails for another reason.
+An already installed r14 service/core pair does not need another upgrade.
 
 ## Sources and validation
 
-- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `0de21b1b`.
+- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `1d1dd1d7`.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
@@ -134,9 +149,9 @@ The service embeds its GUI and uses its matching v2raya_core. Packages are
 assembled by `tools/build-current.sh` / `tools/package-current.py` using static
 Linux ARM64 binaries. This is not a claim of a full OpenWrt SDK build.
 
-The r13 packages install on the official OpenWrt 24.10.4 `armsr/armv8` image
+The r14 packages install on the official OpenWrt 24.10.4 `armsr/armv8` image
 with release-native kernel modules and dependencies. The test starts the
-service, checks both `2.5.7-resilient.7` versions, the embedded GUI, LuCI and
+service, checks both `2.5.7-resilient.8` versions, the embedded GUI, LuCI and
 `coreVersionValid`. A test-only `/usr` disk gives the small generic image enough
 room for both static binaries. The generic ARM64 image accepts the Cortex-A53
 package through a **test-only** opkg architecture alias. Physical hardware and
