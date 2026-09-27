@@ -46,6 +46,34 @@ installs the three packages with their release-native dependencies, starts the
 service and checks both versions, the embedded GUI and LuCI. The test-only
 architecture entry permits the Cortex-A53 package on the generic ARM64 image.
 
+For the complete published-feed compatibility check, use
+`prepare-openwrt-24.10-arm64.ps1` to download and verify the official EFI image
+for each release from 24.10.0 through 24.10.8. Then run
+`test-openwrt-24.10-feed-matrix.ps1` with the verified image directory, current
+three-IPK package directory, QEMU, firmware and Python paths, plus the stamped
+`-AppVersion` and `-PackageRelease`. It boots up to three VMs concurrently by
+default, runs the signed feed setup inside each VM, checks `opkg download` and
+install from the published source, service, GUI, LuCI and `coreVersionValid`,
+and writes `matrix-results.json` and a serial log for every release. Add
+`-TrafficSmoke` to start the local SOCKS fixture and verify four proxied HTTP
+requests through each VM's running core. These are clean-install tests on a
+generic ARM64 image with a test-only architecture alias and extra `/usr` disk;
+they do not establish hardware compatibility for every router model.
+
+Example in PowerShell 7, from this checkout (`$qemu`, `$firmware`, `$python`
+and `$packages` point to installed tools and the three current IPKs):
+
+```powershell
+$images = Join-Path $PWD 'verified-images'
+0..8 | ForEach-Object {
+    ./tools/prepare-openwrt-24.10-arm64.ps1 -Version "24.10.$_" -OutputDir $images
+}
+./tools/test-openwrt-24.10-feed-matrix.ps1 -Qemu $qemu -Firmware $firmware `
+    -ImageDir $images -Packages $packages -Python $python `
+    -AppVersion '2.5.7-resilient.11' -PackageRelease 'r17.resilient1' `
+    -WorkRoot (Join-Path $PWD 'vm-results') -ThrottleLimit 3 -TrafficSmoke
+```
+
 For publication, sign `Packages` using OpenWrt `usign`, distribute only the
 public key through a trusted channel and configure an HTTPS opkg source.
 Do not disable signature verification. The scripts generate an unsigned

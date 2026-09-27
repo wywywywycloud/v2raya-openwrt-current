@@ -9,8 +9,11 @@ architecture to a physical router to bypass opkg checks.
 The current r17 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
 inclusive, on **aarch64_cortex-a53** routers. The feed setup script accepts all
 nine releases. r13 was installed across that entire version range; r17 has so
-far been installed and exercised on the official **24.10.4** `armsr/armv8` VM
-image. The other r17 patch releases and physical routers remain to be tested.
+far been installed from the published signed feed on the official `armsr/armv8`
+VM images for **all nine releases**. The package, service, embedded GUI and LuCI
+checks passed on each version. Physical routers remain to be tested for r17.
+Each VM also passed four proxied HTTP requests against a controlled local
+SOCKS5 test node.
 Use the newest 24.10 security update available for the router.
 
 OpenWrt 25.12 is outside this distribution: that series replaced opkg/IPK with
@@ -154,10 +157,11 @@ The service embeds its GUI and uses its matching v2raya_core. Packages are
 assembled by `tools/build-current.sh` / `tools/package-current.py` using static
 Linux ARM64 binaries. This is not a claim of a full OpenWrt SDK build.
 
-The r17 packages install on the official OpenWrt 24.10.4 `armsr/armv8` image
-with release-native kernel modules and dependencies. The test starts the
+The r17 packages install from the published feed on the official OpenWrt
+24.10.0–24.10.8 `armsr/armv8` images with release-native kernel modules and
+dependencies. The test starts the
 service, checks both `2.5.7-resilient.11` versions, the embedded GUI, LuCI and
 `coreVersionValid`. A test-only `/usr` disk gives the small generic image enough
 room for both static binaries. The generic ARM64 image accepts the Cortex-A53
 package through a **test-only** opkg architecture alias. Physical hardware and
-other architectures are not covered by that VM run.
+other architectures are not covered by these VM runs.
