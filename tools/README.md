@@ -35,6 +35,11 @@ configured official feed indices and install the three files together.
 Check `/api/version`: `coreVersionValid` must be true. Start the service,
 open LuCI's Services / v2rayA page and test actual proxied traffic.
 
+`test-openwrt-24.10.4-arm64.ps1` boots the official `armsr/armv8` EFI image,
+installs the three packages with their release-native dependencies, starts the
+service and checks both versions, the embedded GUI and LuCI. The test-only
+architecture entry permits the Cortex-A53 package on the generic ARM64 image.
+
 For publication, sign `Packages` using OpenWrt `usign`, distribute only the
 public key through a trusted channel and configure an HTTPS opkg source.
 Do not disable signature verification. The scripts generate an unsigned
@@ -55,5 +60,5 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r10.resilient1` with application version `2.5.7-resilient.4`.
+Use release `r11.resilient1` with application version `2.5.7-resilient.5`.
 See [installation instructions](../RESILIENT-INSTALL.md).

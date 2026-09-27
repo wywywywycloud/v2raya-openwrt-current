@@ -4,7 +4,7 @@ import argparse
 import gzip
 import hashlib
 import io
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import tarfile
 
@@ -14,7 +14,7 @@ def archive(files):
     with tarfile.open(fileobj=buf, mode="w", format=tarfile.USTAR_FORMAT) as tar:
         directories = set()
         for name in files:
-            directories.update(str(p) for p in Path(name).parents if str(p) != ".")
+            directories.update(str(p) for p in PurePosixPath(name).parents if str(p) != ".")
         for name in sorted(directories, key=lambda s: (s.count("/"), s)):
             item = tarfile.TarInfo("./" + name)
             item.type, item.mode = tarfile.DIRTYPE, 0o755
@@ -30,7 +30,7 @@ def package(out, name, version, depends, files, conffiles=""):
     original = name
     name = {"v2raya": "v2raya-resilient", "v2raya-core": "v2raya-resilient-core", "luci-app-v2raya": "luci-app-v2raya-resilient"}[original]
     description = {
-        "v2raya": "Resilient fork of v2rayA: automatic healthy proxy groups and four subscription update modes",
+        "v2raya": "Resilient fork of v2rayA: automatic healthy proxy groups, five selection strategies and four update modes",
         "v2raya-core": "Matching proxy core for v2rayA Resilient",
         "luci-app-v2raya": "v2rayA Resilient - install this package for the complete fork with LuCI",
     }[original]
@@ -39,12 +39,16 @@ def package(out, name, version, depends, files, conffiles=""):
         "v2raya-core": "MPL-2.0",
         "luci-app-v2raya": "Apache-2.0",
     }[original]
-    source = "v2raya-openwrt" if original == "luci-app-v2raya" else "v2rayA"
+    source_url = (
+        "https://github.com/wywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10"
+        if original == "luci-app-v2raya"
+        else "https://github.com/wywywycloud/v2rayA-current/tree/main"
+    )
     previous = {"v2raya": "v2raya-levin", "v2raya-core": "v2raya-levin-core", "luci-app-v2raya": "luci-app-v2raya-levin"}[original]
     control = (
         f"Package: {name}\nVersion: {version}\nArchitecture: aarch64_cortex-a53\n"
         f"Provides: {original}, {previous}\nConflicts: {original}, {previous}\nReplaces: {original}, {previous}\n"
-        f"License: {license_name}\nSource: https://github.com/wywywywycloud/{source}-current/tree/release/resilient-openwrt-24.10\n"
+        f"License: {license_name}\nSource: {source_url}\n"
         "Maintainer: wywywywycloud\nSection: net\nPriority: optional\n"
         f"Depends: {depends}\nInstalled-Size: {sum(len(v[0]) for v in files.values())}\n"
         f"Description: {description}\n"
@@ -92,7 +96,7 @@ def main():
             parser.error("Invalid package version")
     root = Path(__file__).resolve().parents[1]
     core = {"usr/bin/v2raya_core": binary(args.core)}
-    init = (root / "v2raya/files/v2raya.init").read_bytes()
+    init = (root / "v2raya/files/v2raya.init").read_bytes().replace(b"\r\n", b"\n")
     marker = b'append_env "config" "/etc/v2raya"'
     if init.count(marker) != 1:
         raise ValueError("Cannot locate the init script's configuration declaration")
@@ -101,7 +105,7 @@ def main():
     app = {
         "usr/bin/v2raya": binary(args.service),
         "etc/init.d/v2raya": (init, 0o755),
-        "etc/config/v2raya": ((root / "v2raya/files/v2raya.config").read_bytes(), 0o600),
+        "etc/config/v2raya": ((root / "v2raya/files/v2raya.config").read_bytes().replace(b"\r\n", b"\n"), 0o600),
         "lib/upgrade/keep.d/v2raya": (b"/etc/v2raya/\n", 0o644),
     }
     luci = {}
@@ -109,7 +113,8 @@ def main():
         base = root / "luci-app-v2raya" / source
         for file in base.rglob("*"):
             if file.is_file():
-                luci[str(Path(target) / file.relative_to(base))] = (file.read_bytes(), 0o644)
+                path = Path(target) / file.relative_to(base)
+                luci[path.as_posix()] = (file.read_bytes(), 0o644)
     if not luci:
         raise ValueError("LuCI source files are missing")
     menu = "usr/share/luci/menu.d/luci-app-v2raya.json"

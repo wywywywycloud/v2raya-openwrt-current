@@ -21,9 +21,9 @@ end-of-life OpenWrt series is listed as supported.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r10.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.4-r10.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.4-r10.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r11.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.5-r11.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.5-r11.resilient1 |
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -45,8 +45,12 @@ change its settings. It replaces this project's previous feed entries and keeps
 all other sources. The previous source configuration is saved as
 `/etc/opkg/customfeeds.conf.before-resilient` when changed.
 
-Public key fingerprint: `9f02e659f24749fa`.
-Public key SHA256: `6ef5500355caf6da06e020818151ee1a6533336387450b7ac28dcaba5540d979`.
+Public key fingerprint: `9478c50315c92021`.
+Public key SHA256: `7a5f9426bdbacd25d1e89ad7e5e65579b2c33bcd278b0489772f3ab017df8787`.
+
+Release r11 rotates the Resilient feed key. Existing installations must run
+the setup command above once before `opkg update`; package settings and the
+installed service are not changed by the setup script.
 
 The source line, also visible under Software > Configure opkg, is:
 
@@ -64,7 +68,7 @@ Keep signature verification enabled.
    dialog. Leave **Allow overwriting conflicting package files** unchecked.
 3. Refresh LuCI. Open **Services > v2rayA Resilient**. On a clean installation,
    enable the service and click **Save & Apply**, then open its web interface.
-4. Confirm the application and core both report `2.5.7-resilient.4`.
+4. Confirm the application and core both report `2.5.7-resilient.5`.
 
 If Software is absent, install the official `luci-app-package-manager` first.
 The setup needs normal working Internet access. Stop a broken transparent proxy
@@ -88,8 +92,10 @@ always retain an off-router backup.
 
 In the application, open the proxy group settings and enable **Automatically
 add available servers**. The group checks the entire Proxies catalog using its
-probe URL; new groups default to **300s**. Keep group selection on **Auto** for
-least-latency selection. An empty automatic group blocks traffic assigned to it.
+probe URL; new groups default to **300s**. The selection list offers latency,
+random-within-a-bounded-latency-window and first-available strategies. Use the
+`?` help beside the selector for the exact behavior. An empty automatic group
+blocks traffic assigned to it.
 This is not a system-wide kill switch for service crashes or manual shutdown.
 
 For each subscription, choose one **Automatic subscription update** mode:
@@ -108,11 +114,11 @@ the `PROXY` group once when at least one old subscription used it. Otherwise,
 automatic group membership remains disabled until enabled explicitly.
 
 For an existing Resilient installation, update package lists and upgrade
-**luci-app-v2raya-resilient** in Software; it requires the matching r10 service/core.
+**luci-app-v2raya-resilient** in Software; it requires the matching r11 service/core.
 
 ## Sources and validation
 
-- Application/core: [Resilient source branch](https://github.com/wywywywycloud/v2rayA-current/tree/release/resilient-openwrt-24.10), application commit `a0bad190`.
+- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `23c5259b`.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
@@ -120,10 +126,10 @@ The service embeds its GUI and uses its matching v2raya_core. Packages are
 assembled by `tools/build-current.sh` / `tools/package-current.py` using static
 Linux ARM64 binaries. This is not a claim of a full OpenWrt SDK build.
 
-The release matrix uses all nine official OpenWrt 24.10.0-24.10.8 armsr/armv8
-images with 256 MiB RAM. Full functional, migration, failure and reboot tests
-run on 24.10.4 and 24.10.5; the other releases repeat the clean signed-feed,
-release-native kernel-module, service/core, embedded-GUI and LuCI checks. The
-VM's generic ARM64 CPU accepts the Cortex-A53 package through a **test-only**
-opkg architecture alias. Physical hardware and other architectures are not
-covered.
+The r11 packages install on the official OpenWrt 24.10.4 `armsr/armv8` image
+with release-native kernel modules and dependencies. The test starts the
+service, checks both `2.5.7-resilient.5` versions, the embedded GUI, LuCI and
+`coreVersionValid`. A test-only `/usr` disk gives the small generic image enough
+room for both static binaries. The generic ARM64 image accepts the Cortex-A53
+package through a **test-only** opkg architecture alias. Physical hardware and
+other architectures are not covered by that VM run.
