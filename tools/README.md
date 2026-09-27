@@ -70,7 +70,7 @@ $images = Join-Path $PWD 'verified-images'
 }
 ./tools/test-openwrt-24.10-feed-matrix.ps1 -Qemu $qemu -Firmware $firmware `
     -ImageDir $images -Packages $packages -Python $python `
-    -AppVersion '2.5.7-resilient.11' -PackageRelease 'r17.resilient1' `
+    -AppVersion '2.5.7-resilient.11' -PackageRelease 'r18.resilient1' `
     -WorkRoot (Join-Path $PWD 'vm-results') -ThrottleLimit 3 -TrafficSmoke
 ```
 
@@ -94,7 +94,7 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r17.resilient1` with application version `2.5.7-resilient.11`.
+Use release `r18.resilient1` with application version `2.5.7-resilient.11`.
 `test-openwrt-24.10.4-arm64.ps1` accepts `-AppVersion` and `-PackageRelease`
 so each package set is checked against its own stamped binaries. For a live
 traffic run, start `local-socks-fixture.py` on the host, pass `-LiveTestSignal`
@@ -105,3 +105,35 @@ manual membership refresh, subscription reordering and manual start with a
 cached automatic group. Create the signal file
 to let the VM script shut down and save its serial log.
 See [installation instructions](../RESILIENT-INSTALL.md).
+
+## OpenWrt-only first-install defaults (r18)
+
+`apply-resilient-defaults.py` is applied to an **isolated** checkout of
+`wywywywycloud/v2rayA-current` at `7d9fcfca05070226066f7f7d16e67aa99c08c3aa`.
+The fork's `main` branch and upstream pull requests are not changed. The
+packaging release remains application version `2.5.7-resilient.11`, with opkg
+release `r18.resilient1` to distinguish the patched binary.
+
+On a new database this selects RoutingA, TPROXY, HTTP+TLS sniffing, IP
+forwarding and port sharing. The PROXY group starts in keep-current mode with
+auto-add enabled, the standard 204 probe URL, and a 3000-second interval. New
+subscriptions use interval/failsafe updates: 60 minutes normally, one minute
+after a failure, with direct recovery. The UCI service is enabled on a clean
+install. The bundled RoutingA rules match the public Russia template on the
+reference router; its MIT notice is shipped in the service IPK.
+
+These values are defaults, so an existing SQLite database, account, node,
+subscription URL and manual pin are never overwritten. No private router data
+is bundled. The router's old `dnsfix.sh` transparent hook is intentionally not
+copied: the current service has native DNS redirect rules, and installing a
+second NAT hook would duplicate them. Existing UCI conffiles retain any
+locally configured hook during an upgrade.
+
+To reproduce the build, clone the above commit into a disposable checkout,
+run `python3 tools/apply-resilient-defaults.py /path/to/disposable-checkout`,
+then build the GUI and both Linux ARM64 binaries from that checkout at version
+`2.5.7-resilient.11`. Package them with `package-current.py` using service/core
+version `2.5.7-resilient.11-r18.resilient1` and LuCI version
+`26.268.0-r18.resilient1`. `test-openwrt-24.10.4-arm64.ps1
+-CheckResilientDefaults` verifies the first-install settings and a new
+subscription through the live API on a clean OpenWrt VM.

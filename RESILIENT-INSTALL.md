@@ -6,12 +6,12 @@ architecture to a physical router to bypass opkg checks.
 
 ## Supported OpenWrt releases
 
-The current r17 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
+The current r18 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
 inclusive, on **aarch64_cortex-a53** routers. The feed setup script accepts all
-nine releases. r13 was installed across that entire version range; r17 has so
-far been installed from the published signed feed on the official `armsr/armv8`
+nine releases. r13 was installed across that entire version range; r17 was
+installed from the published signed feed on the official `armsr/armv8`
 VM images for **all nine releases**. The package, service, embedded GUI and LuCI
-checks passed on each version. Physical routers remain to be tested for r17.
+checks passed on each version. Physical routers remain to be tested for r18.
 Each VM also passed four proxied HTTP requests against a controlled local
 SOCKS5 test node.
 Use the newest 24.10 security update available for the router.
@@ -24,12 +24,12 @@ end-of-life OpenWrt series is listed as supported.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r17.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.11-r17.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.11-r17.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r18.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.11-r18.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.11-r18.resilient1 |
 
-r17 makes the documentation link in RoutingA's action row use the same font
-as its neighbouring buttons. The service and core carry matching version stamps.
+r18 adds credential-free settings from the reference router as first-install
+defaults. The service and core carry matching version stamps.
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -145,11 +145,11 @@ and LuCI package together. If there is too little free flash, it stops before
 upgrading any of them. The three package versions are checked afterward. opkg
 does not provide an atomic transaction, so retain a configuration backup and
 inspect the package status if an installation fails for another reason.
-An already installed r17 service/core pair does not need another upgrade.
+An already installed r18 service/core pair does not need another upgrade.
 
 ## Sources and validation
 
-- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `dae1496f`.
+- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `7d9fcfca`, with a packaging-only defaults patch.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
@@ -157,7 +157,7 @@ The service embeds its GUI and uses its matching v2raya_core. Packages are
 assembled by `tools/build-current.sh` / `tools/package-current.py` using static
 Linux ARM64 binaries. This is not a claim of a full OpenWrt SDK build.
 
-The r17 packages install from the published feed on the official OpenWrt
+The r17 packages installed from the published feed on the official OpenWrt
 24.10.0–24.10.8 `armsr/armv8` images with release-native kernel modules and
 dependencies. The test starts the
 service, checks both `2.5.7-resilient.11` versions, the embedded GUI, LuCI and
@@ -165,3 +165,10 @@ service, checks both `2.5.7-resilient.11` versions, the embedded GUI, LuCI and
 room for both static binaries. The generic ARM64 image accepts the Cortex-A53
 package through a **test-only** opkg architecture alias. Physical hardware and
 other architectures are not covered by these VM runs.
+
+r18 was also installed on a fresh OpenWrt 24.10.4 ARM64 VM before publication.
+The service, matching core, LuCI menu, embedded GUI and API started. Its live
+settings matched the reference router's public defaults, including RoutingA,
+TPROXY, HTTP+TLS sniffing, PROXY keep-current/auto-add/3000s and a newly
+imported test subscription's 60-minute/one-minute failover schedule. The
+published-feed opkg installation is checked separately after release.

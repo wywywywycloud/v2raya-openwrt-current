@@ -39,11 +39,8 @@ def package(out, name, version, depends, files, conffiles=""):
         "v2raya-core": "MPL-2.0",
         "luci-app-v2raya": "Apache-2.0",
     }[original]
-    source_url = (
-        "https://github.com/wywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10"
-        if original == "luci-app-v2raya"
-        else "https://github.com/wywywycloud/v2rayA-current/tree/main"
-    )
+    # The service receives OpenWrt-only defaults in this packaging branch.
+    source_url = "https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10"
     previous = {"v2raya": "v2raya-levin", "v2raya-core": "v2raya-levin-core", "luci-app-v2raya": "luci-app-v2raya-levin"}[original]
     control = (
         f"Package: {name}\nVersion: {version}\nArchitecture: aarch64_cortex-a53\n"
@@ -107,6 +104,7 @@ def main():
         "etc/init.d/v2raya": (init, 0o755),
         "etc/config/v2raya": ((root / "v2raya/files/v2raya.config").read_bytes().replace(b"\r\n", b"\n"), 0o600),
         "lib/upgrade/keep.d/v2raya": (b"/etc/v2raya/\n", 0o644),
+        "usr/share/licenses/v2raya-resilient/LICENSE-russia.txt": ((root / "licenses/LICENSE-russia.txt").read_bytes().replace(b"\r\n", b"\n"), 0o644),
     }
     luci = {}
     for source, target in [("root", ""), ("htdocs", "www")]:
