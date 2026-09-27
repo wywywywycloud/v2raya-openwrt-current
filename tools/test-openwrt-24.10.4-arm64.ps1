@@ -164,18 +164,24 @@ try {
     Wait-Serial "br-lan: port 1(eth0) entered forwarding state" $deadline
     $ipks = Get-ChildItem -LiteralPath $Packages -Filter "*.ipk" -File
     if ($ipks.Count -ne 3) { throw "Expected exactly three IPKs, found $($ipks.Count)" }
-    Invoke-Serial '(ip addr add 10.0.2.15/24 dev br-lan 2>/dev/null || true) && ip link set br-lan up && ip route replace default via 10.0.2.2 && mkdir -p /tmp/resolv.conf.d && printf "nameserver 10.0.2.3\n" > /tmp/resolv.conf.d/resolv.conf.auto && . /etc/openwrt_release && test "$DISTRIB_RELEASE" = "24.10.4" && test "$(uname -m)" = "aarch64" && ping -c 1 10.0.2.2' "__R11_NETWORK_OK__"
-    Invoke-Serial 'mkfs.ext4 -F /dev/vdb && mkdir -p /mnt/r11-usr && mount /dev/vdb /mnt/r11-usr && cp -a /usr/. /mnt/r11-usr/ && mount /dev/vdb /usr' "__R11_USR_READY__" 5
+    Invoke-Serial '(ip addr add 10.0.2.15/24 dev br-lan 2>/dev/null || true) && ip link set br-lan up && ip route replace default via 10.0.2.2 && mkdir -p /tmp/resolv.conf.d && printf "nameserver 10.0.2.3\n" > /tmp/resolv.conf.d/resolv.conf.auto && . /etc/openwrt_release && test "$DISTRIB_RELEASE" = "24.10.4" && test "$(uname -m)" = "aarch64" && ping -c 1 10.0.2.2' "__RESILIENT_NETWORK_OK__"
+    Invoke-Serial 'mkfs.ext4 -F /dev/vdb && mkdir -p /mnt/resilient-usr && mount /dev/vdb /mnt/resilient-usr && cp -a /usr/. /mnt/resilient-usr/ && mount /dev/vdb /usr' "__RESILIENT_USR_READY__" 5
     $downloadNumber = 0
     foreach ($ipk in $ipks) {
         $downloadNumber++
         $download = "wget -O /tmp/$($ipk.Name) http://10.0.2.2:${PackagePort}/$($ipk.Name)"
-        Invoke-Serial $download "__R11_IPK_${downloadNumber}__" 15
+        Invoke-Serial $download "__RESILIENT_IPK_${downloadNumber}__" 15
     }
-    Invoke-Serial "printf 'arch all 1\narch noarch 1\narch aarch64_generic 10\narch aarch64_cortex-a53 100\n' >> /etc/opkg.conf; opkg update" "__R11_UPDATED__" 15
-    Invoke-Serial "opkg install /tmp/v2raya-resilient-core_*_aarch64_cortex-a53.ipk /tmp/v2raya-resilient_2*_aarch64_cortex-a53.ipk /tmp/luci-app-v2raya-resilient_*_aarch64_cortex-a53.ipk" "__R11_INSTALLED__" 15
-    Invoke-Serial 'for package in v2raya-resilient v2raya-resilient-core luci-app-v2raya-resilient; do opkg status "$package" | grep -E "^(Package|Version|Status):"; done; /usr/bin/v2raya --version; /usr/bin/v2raya_core version; test -f /usr/share/luci/menu.d/luci-app-v2raya.json; test -f /www/luci-static/resources/view/v2raya/config.js' "__R11_VERSIONS_OK__"
-    Invoke-Serial "uci set v2raya.config.enabled='1'; uci commit v2raya; /etc/init.d/v2raya restart; sleep 8; /etc/init.d/v2raya running; wget -qO /tmp/v2raya-index http://127.0.0.1:2017/; grep -q '<title>v2rayA</title>' /tmp/v2raya-index; wget -qO- http://127.0.0.1:2017/api/version" "__R11_SERVICE_OK__"
+    Invoke-Serial "printf 'arch all 1\narch noarch 1\narch aarch64_generic 10\narch aarch64_cortex-a53 100\n' >> /etc/opkg.conf; opkg update" "__RESILIENT_UPDATED__" 15
+    Invoke-Serial "opkg install /tmp/v2raya-resilient-core_*_aarch64_cortex-a53.ipk /tmp/v2raya-resilient_2*_aarch64_cortex-a53.ipk /tmp/luci-app-v2raya-resilient_*_aarch64_cortex-a53.ipk" "__RESILIENT_INSTALLED__" 15
+    Invoke-Serial 'test "$(opkg status v2raya-resilient | sed -n "s/^Version: //p")" = "2.5.7-resilient.6-r12.resilient1"' "__RESILIENT_APP_PACKAGE_OK__"
+    Invoke-Serial 'test "$(opkg status v2raya-resilient-core | sed -n "s/^Version: //p")" = "2.5.7-resilient.6-r12.resilient1"' "__RESILIENT_CORE_PACKAGE_OK__"
+    Invoke-Serial 'test "$(opkg status luci-app-v2raya-resilient | sed -n "s/^Version: //p")" = "26.268.0-r12.resilient1"' "__RESILIENT_LUCI_PACKAGE_OK__"
+    Invoke-Serial 'test "$(/usr/bin/v2raya --version)" = "2.5.7-resilient.6"; /usr/bin/v2raya_core version | grep -q "V2RAYA_CORE 2.5.7-resilient.6 "' "__RESILIENT_BINARY_VERSIONS_OK__"
+    Invoke-Serial 'test -f /usr/share/luci/menu.d/luci-app-v2raya.json; test -f /www/luci-static/resources/view/v2raya/config.js' "__RESILIENT_LUCI_FILES_OK__"
+    Invoke-Serial "uci set v2raya.config.enabled='1'; uci commit v2raya; /etc/init.d/v2raya restart; sleep 8; /etc/init.d/v2raya running" "__RESILIENT_SERVICE_RUNNING__"
+    Invoke-Serial "wget -qO /tmp/v2raya-index http://127.0.0.1:2017/; grep -q '<title>v2rayA</title>' /tmp/v2raya-index" "__RESILIENT_GUI_OK__"
+    Invoke-Serial 'wget -qO /tmp/v2raya-version http://127.0.0.1:2017/api/version; grep -q ''"version":"2.5.7-resilient.6"'' /tmp/v2raya-version; grep -q ''"coreVersion":"2.5.7-resilient.6"'' /tmp/v2raya-version; grep -q ''"coreVersionValid":true'' /tmp/v2raya-version' "__RESILIENT_API_OK__"
 } finally {
     if (-not $qemuProcess.HasExited) { $qemuProcess.Kill($true); $qemuProcess.WaitForExit() }
     if (-not $httpProcess.HasExited) { $httpProcess.Kill($true); $httpProcess.WaitForExit() }
