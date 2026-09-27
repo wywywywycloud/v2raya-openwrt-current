@@ -136,10 +136,14 @@ echo '__RESILIENT_FIRST_AVAILABLE_TRAFFIC_OK__'
 policy random false
 wait_any_route
 [ "$(main_core_pid)" = "$stable" ] || { echo "policy edit restarted the core" >&2; exit 1; }
+random_choice=$(trace)
 i=0
 while [ "$i" -lt 8 ]; do
     actual=$(trace)
-    case "$actual" in A|B) ;; *) echo "random routed to $actual" >&2; exit 1 ;; esac
+    [ "$actual" = "$random_choice" ] || {
+        echo "random changed healthy route from $random_choice to $actual" >&2
+        exit 1
+    }
     /etc/init.d/v2raya running
     i=$((i + 1))
     sleep 1
