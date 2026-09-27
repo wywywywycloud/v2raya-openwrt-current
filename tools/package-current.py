@@ -136,7 +136,7 @@ def main():
     )
     # LuCI commits an index entry at the blank paragraph separator.
     index += "\n"
-    (args.output / "Packages").write_text(index)
+    (args.output / "Packages").write_text(index, newline="\n")
     (args.output / "Packages.gz").write_bytes(gzip.compress(index.encode(), mtime=0))
 
 
