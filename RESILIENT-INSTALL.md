@@ -171,4 +171,6 @@ The service, matching core, LuCI menu, embedded GUI and API started. Its live
 settings matched the reference router's public defaults, including RoutingA,
 TPROXY, HTTP+TLS sniffing, PROXY keep-current/auto-add/3000s and a newly
 imported test subscription's 60-minute/one-minute failover schedule. The
-published-feed opkg installation is checked separately after release.
+published signed feed was then installed on a second clean 24.10.4 VM with
+`opkg install luci-app-v2raya-resilient`; the same checks passed. See
+[the r18 validation report](https://github.com/wywywywycloud/v2rayA-current/blob/openwrt-feed/openwrt-24.10/resilient/VALIDATION-r18.md).
