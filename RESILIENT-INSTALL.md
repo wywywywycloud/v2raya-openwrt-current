@@ -6,11 +6,11 @@ architecture to a physical router to bypass opkg checks.
 
 ## Supported OpenWrt releases
 
-The current r15 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
+The current r17 feed is offered for **OpenWrt 24.10.0 through 24.10.8**,
 inclusive, on **aarch64_cortex-a53** routers. The feed setup script accepts all
-nine releases. r13 was installed across that entire version range; r15 has so
+nine releases. r13 was installed across that entire version range; r17 has so
 far been installed and exercised on the official **24.10.4** `armsr/armv8` VM
-image. The other r15 patch releases and physical routers remain to be tested.
+image. The other r17 patch releases and physical routers remain to be tested.
 Use the newest 24.10 security update available for the router.
 
 OpenWrt 25.12 is outside this distribution: that series replaced opkg/IPK with
@@ -21,9 +21,12 @@ end-of-life OpenWrt series is listed as supported.
 
 | Package | Purpose | Version |
 | --- | --- | --- |
-| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r15.resilient1 |
-| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.9-r15.resilient1 |
-| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.9-r15.resilient1 |
+| **luci-app-v2raya-resilient** | Install this one in LuCI; pulls the complete fork | 26.268.0-r17.resilient1 |
+| v2raya-resilient | Service and embedded v2rayA web interface | 2.5.7-resilient.11-r17.resilient1 |
+| v2raya-resilient-core | Exact matching proxy core | 2.5.7-resilient.11-r17.resilient1 |
+
+r17 makes the documentation link in RoutingA's action row use the same font
+as its neighbouring buttons. The service and core carry matching version stamps.
 
 The menu is **Services > v2rayA Resilient**. Configuration and service paths retain
 `v2raya` so existing settings and accounts can survive replacement. This is a
@@ -68,7 +71,7 @@ Keep signature verification enabled.
    dialog. Leave **Allow overwriting conflicting package files** unchecked.
 3. Refresh LuCI. Open **Services > v2rayA Resilient**. On a clean installation,
    enable the service and click **Save & Apply**, then open its web interface.
-4. Confirm the application and core both report `2.5.7-resilient.9`.
+4. Confirm the application and core both report `2.5.7-resilient.11`.
 
 If Software is absent, install the official `luci-app-package-manager` first.
 The setup needs normal working Internet access. Stop a broken transparent proxy
@@ -139,11 +142,11 @@ and LuCI package together. If there is too little free flash, it stops before
 upgrading any of them. The three package versions are checked afterward. opkg
 does not provide an atomic transaction, so retain a configuration backup and
 inspect the package status if an installation fails for another reason.
-An already installed r15 service/core pair does not need another upgrade.
+An already installed r17 service/core pair does not need another upgrade.
 
 ## Sources and validation
 
-- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `deeb7b41`.
+- Application/core: [Resilient source](https://github.com/wywywywycloud/v2rayA-current/tree/main), application commit `dae1496f`.
 - Packaging/LuCI: [Resilient packaging branch](https://github.com/wywywywycloud/v2raya-openwrt-current/tree/release/resilient-openwrt-24.10).
 - [Signed feed and validation report](https://github.com/wywywywycloud/v2rayA-current/tree/openwrt-feed/openwrt-24.10/resilient).
 
@@ -151,9 +154,9 @@ The service embeds its GUI and uses its matching v2raya_core. Packages are
 assembled by `tools/build-current.sh` / `tools/package-current.py` using static
 Linux ARM64 binaries. This is not a claim of a full OpenWrt SDK build.
 
-The r15 packages install on the official OpenWrt 24.10.4 `armsr/armv8` image
+The r17 packages install on the official OpenWrt 24.10.4 `armsr/armv8` image
 with release-native kernel modules and dependencies. The test starts the
-service, checks both `2.5.7-resilient.9` versions, the embedded GUI, LuCI and
+service, checks both `2.5.7-resilient.11` versions, the embedded GUI, LuCI and
 `coreVersionValid`. A test-only `/usr` disk gives the small generic image enough
 room for both static binaries. The generic ARM64 image accepts the Cortex-A53
 package through a **test-only** opkg architecture alias. Physical hardware and

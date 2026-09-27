@@ -66,7 +66,7 @@ names while retaining their service and configuration paths.
 The index ends every package paragraph, including the final one, with a blank
 line: OpenWrt 24.10 LuCI otherwise omits the last package from Software.
 
-Use release `r15.resilient1` with application version `2.5.7-resilient.9`.
+Use release `r17.resilient1` with application version `2.5.7-resilient.11`.
 `test-openwrt-24.10.4-arm64.ps1` accepts `-AppVersion` and `-PackageRelease`
 so each package set is checked against its own stamped binaries. For a live
 traffic run, start `local-socks-fixture.py` on the host, pass `-LiveTestSignal`
