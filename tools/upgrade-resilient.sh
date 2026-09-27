@@ -11,13 +11,20 @@ fail() {
 }
 
 field() {
-    awk -v package="$1" -v key="$2" '
+    # OpenWrt 24.10 opkg keeps downloaded Packages.gz in /var/opkg-lists,
+    # although the cached filename has no .gz suffix. Accept plain indices
+    # too, for local mirrors and older opkg variants.
+    if gzip -t "$feed_index" >/dev/null 2>&1; then
+        gzip -dc "$feed_index"
+    else
+        cat "$feed_index"
+    fi | awk -v package="$1" -v key="$2" '
         /^Package: / { selected = ($2 == package) }
         selected && index($0, key ": ") == 1 {
             print substr($0, length(key) + 3)
             exit
         }
-    ' "$feed_index"
+    '
 }
 
 free_kib() {
