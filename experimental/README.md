@@ -4,7 +4,7 @@ This directory contains the package builder, LuCI view, init script, configurati
 
 Build on Linux with Go **1.26.8**, Node 24 and Yarn 1.22.22. Use the committed `core/go.mod`, `core/go.sum` and `gui/yarn.lock`; do not replace the pinned Xray or net forks with local checkouts. Both remote fork replacements are declared in the main core module because dependency-module replacements are not inherited.
 
-The build commands below run from the **application checkout**, not this packaging repository. Use application commit `9fa40b2f24bb0ed22ef7a510f625e7651a3c2757` from `wywywywycloud/v2rayA-resilient`, as recorded in [SOURCE.json](SOURCE.json). Its runtime/build sources are identical to the build input `51911ad7`; the four changed root documents only correct the release destination and name.
+The build commands below run from the **application checkout**, not this packaging repository. Use application commit `002c144fef9be4aeee4716adb2f8d2913d04d6ca` from `wywywywycloud/v2rayA-resilient`, as recorded in [SOURCE.json](SOURCE.json). This is the exact source used for the validated release build.
 
 From that application checkout, build the frontend and ARM64 binaries with a shared version:
 
