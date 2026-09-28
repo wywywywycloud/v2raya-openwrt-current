@@ -180,3 +180,40 @@ The script is for a disposable VM. It creates the `vm-test` fixture account,
 imports two local SOCKS nodes, changes group policies, records sampled core
 counts and exercises real proxied requests. Do not run it against a router.
 The `ssh -F NUL` default is for the Windows host used by the ARM64 harness.
+
+## Subscription stability and protected switches (r21)
+
+Build application commit `283daeb0` with `apply-resilient-defaults.py` applied
+only to a disposable source checkout. Stamp both binaries
+`2.5.7-resilient.14`, service/core packages `2.5.7-resilient.14-r21.resilient1`
+and LuCI `26.268.0-r21.resilient1`.
+
+Use the ARM64 harness and test certificate described above. The r21 checks use
+`local-stability-fixture.py` instead of the r20 fixture: it provides three
+controlled SOCKS nodes, reorder/rename/membership changes, transient health
+failures, slow speed responses, and UDP DNS with a rejecting TCP listener.
+Run it with `--speed-cert <cert.pem> --speed-key <key.pem>`.
+
+```text
+python tools/test-subscription-stability.py --ssh-key <vm-key> --ssh-port 29922 --api-port 29925 --output <results>
+python tools/test-interception-retention.py --ssh-key <vm-key> --ssh-port 29922 --api-port 29925 --output <results> --transparent-type tproxy
+python tools/test-interception-retention.py --ssh-key <vm-key> --ssh-port 29922 --api-port 29925 --output <results> --transparent-type redirect
+```
+
+These scripts change the disposable VM's policy, routing rules, interception
+exclusions and lifecycle hook. Never run them against a real router. The
+subscription test checks uninterrupted streams on reorder/rename, policy
+preservation, reachable slow nodes, true catalog changes and confirmed failover,
+and samples the process count. The interception test assigns TEST-NET traffic
+to the proxy through RoutingA, verifies a working transparent request first,
+then delays startup and injects startup/rollback failures while counting any
+unmarked packets that leave the guest. It removes TEST-NET's usual deliberate
+direct exemption so that the counter measures actual bypass. A restored table
+alone is insufficient: every sample and packet counter must pass. Install the
+old r20 packages first and add `--expect-old` to reproduce the previous failure.
+
+Keep-current now retains a reachable current node even with low or unknown
+speed; three failed reachability checks trigger a speed-qualified replacement.
+Do not use the historical r20 low-speed-eviction assertion for r21. The r21
+release was checked on one 24.10.4 ARM64 VM with 512 MiB; it does not claim a
+new physical-router or nine-version matrix run.
