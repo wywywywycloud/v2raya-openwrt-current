@@ -1,0 +1,21 @@
+{
+  "product": "x-Ray VPN",
+  "releaseName": "xray-proxy-client-experimental",
+  "version": "2026.09.28-experimental.1",
+  "tag": "experimental-2026.09.28.1",
+  "repository": "https://github.com/wywywywycloud/v2rayA-resilient",
+  "sourceCommit": "9fa40b2f24bb0ed22ef7a510f625e7651a3c2757",
+  "buildInputCommit": "51911ad7a380ccf055819b5c730f4426d33c11c3",
+  "sourceDifference": "Only root README.md, README_ru.md, README_zh.md and EXPERIMENTAL.md release links/name; no runtime or build input changed.",
+  "sourceArchive": "https://codeload.github.com/wywywywycloud/v2rayA-resilient/tar.gz/9fa40b2f24bb0ed22ef7a510f625e7651a3c2757",
+  "sourceArchiveSHA256": "f391ef460db1aaf29539f05dd303e7321bb78849c3da903eae63cb65c3398fc5",
+  "xrayCommit": "9ef5632ee09d2ac61b48bbe2e7a47227866b7c76",
+  "xrayModule": "github.com/wywywywycloud/Xray-core v1.260327.1-0.20260928165923-9ef5632ee09d",
+  "netCommit": "0db38890600aa5a4aaddc1d450164c752371bd63",
+  "netModule": "github.com/wywywywycloud/net v0.0.0-20260928004604-0db38890600a",
+  "go": "1.26.8",
+  "node": "24.21.0",
+  "yarn": "1.22.22",
+  "packageArchitecture": "aarch64_cortex-a53",
+  "validation": "Pending final release artifact checks; see release VALIDATION.md."
+}

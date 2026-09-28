@@ -1,4 +1,12 @@
-# v2raya-openwrt
+# x-Ray VPN — experimental OpenWrt release
+
+This branch prepares **xray-proxy-client-experimental**. The application is called **x-Ray VPN**; the existing repository and compatible service/package identifiers are retained.
+
+Source revisions and immutable dependency pins are recorded in [experimental/SOURCE.json](experimental/SOURCE.json). Reproduce the application build from that exact application commit using its `install/openwrt-experimental/README.md`; the matching package builder is also preserved in [experimental](experimental/README.md).
+
+Download the three matching ARM64 IPKs and `SHA256SUMS` from [the experimental release](https://github.com/wywywywycloud/v2raya-openwrt-current/releases/tag/experimental-2026.09.28.1). Actual installation/runtime results belong to that release's `VALIDATION.md`. This experimental release is separate from the historical signed feed below and does not claim official OpenWrt feed acceptance.
+
+## Historical v2raya-openwrt documentation
 
 opkg feed of v2rayA for OpenWrt users.
 
